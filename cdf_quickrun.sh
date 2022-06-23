@@ -13,8 +13,8 @@ function await_scale {
 }
 
 function push_latest {
-  docker tag "opensearch:1.0.0" "${CDF_SERVER}:5000/srg/opensearch:1.0.0-test"
-  docker push "${CDF_SERVER}:5000/srg/opensearch:1.0.0-test"
+  docker tag "opensearch:1.3.2" "${CDF_SERVER}:5000/srg/opensearch:1.3.2-test"
+  docker push "${CDF_SERVER}:5000/srg/opensearch:1.3.2-test"
 }
 
 function pull_always {
@@ -23,8 +23,8 @@ function pull_always {
 }
 
 function set_image {
-  kubectl set image statefulset/opensearch-master "opensearch=localhost:5000/srg/opensearch:1.0.0-test" -n "${NAMESPACE}"
-  kubectl set image statefulset/opensearch-data "opensearch=localhost:5000/srg/opensearch:1.0.0-test" -n "${NAMESPACE}"
+  kubectl set image statefulset/opensearch-master "opensearch=localhost:5000/srg/opensearch:1.3.2-test" -n "${NAMESPACE}"
+  kubectl set image statefulset/opensearch-data "opensearch=localhost:5000/srg/opensearch:1.3.2-test" -n "${NAMESPACE}"
 }
 
 push_latest

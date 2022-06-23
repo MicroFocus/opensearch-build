@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=1.2.4
+VERSION=1.3.2
 PRODUCT=opensearch
 DOCKERFILE=dockerfiles/opensearch.microfocus.dockerfile
 ARCH=x64
