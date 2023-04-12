@@ -7,7 +7,7 @@
 # this file be licensed under the Apache-2.0 license or a
 # compatible open source license.
 
-# © Copyright 2022-2023 OpenText or one of its affiliates.
+# Copyright 2022-2023 OpenText or one of its affiliates.
 # Licensed under Apache-2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at:
