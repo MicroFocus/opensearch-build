@@ -67,7 +67,8 @@ class ServiceOpenSearchDashboardsTests(unittest.TestCase):
         mock_dump.assert_called_once_with(
             {
                 "script.context.field.max_compilations_rate": "1000/1m",
-                "logging.dest": os.path.join(self.work_dir, "opensearch-dashboards-1.1.0", "logs", "opensearch_dashboards.log")
+                "logging.dest": os.path.join(self.work_dir, "opensearch-dashboards-1.1.0", "logs", "opensearch_dashboards.log"),
+                "server.host": "0.0.0.0"
             }
         )
         mock_file.return_value.write.assert_called_once_with(mock_dump_result)
@@ -120,15 +121,18 @@ class ServiceOpenSearchDashboardsTests(unittest.TestCase):
             [call(os.path.join(self.work_dir, "opensearch-dashboards-1.1.0", "config", "opensearch_dashboards.yml"), "a")],
         )
 
-        plugin_script = "opensearch-dashboards-plugin.bat" if current_platform() == "windows" else "bash opensearch-dashboards-plugin"
+        cwd_path = os.path.join("test_work_dir", "opensearch-dashboards-1.1.0", "bin")
+        plugin_script = "opensearch-dashboards-plugin.bat" if current_platform() == "windows" else "opensearch-dashboards-plugin"
+        plugin_script = os.path.join(cwd_path, plugin_script)
+        plugin_script = "sudo " + plugin_script if service.dist.require_sudo is True else plugin_script
         mock_check_call.assert_called_once_with(
             f"{plugin_script} remove --allow-root securityDashboards",
-            cwd=os.path.join("test_work_dir", "opensearch-dashboards-1.1.0", "bin"),
+            cwd=cwd_path,
             shell=True
         )
 
         mock_dump.assert_called_once_with({"logging.dest": os.path.join(
-            self.work_dir, "opensearch-dashboards-1.1.0", "logs", "opensearch_dashboards.log")})
+            self.work_dir, "opensearch-dashboards-1.1.0", "logs", "opensearch_dashboards.log"), 'server.host': '0.0.0.0'})
 
         mock_file_handler_for_security.close.assert_called_once()
         mock_file_handler_for_additional_config.write.assert_called_once_with(mock_dump_result)
@@ -190,7 +194,7 @@ class ServiceOpenSearchDashboardsTests(unittest.TestCase):
         )
 
         mock_dump.assert_called_once_with({"logging.dest": os.path.join(
-            self.work_dir, "opensearch-dashboards-1.1.0", "logs", "opensearch_dashboards.log")})
+            self.work_dir, "opensearch-dashboards-1.1.0", "logs", "opensearch_dashboards.log"), 'server.host': '0.0.0.0'})
 
         mock_file_handler_for_security.close.assert_called_once()
         mock_file_handler_for_additional_config.write.assert_called_once_with(mock_dump_result)

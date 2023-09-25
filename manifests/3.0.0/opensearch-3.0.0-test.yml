@@ -3,8 +3,8 @@ schema-version: '1.0'
 name: OpenSearch
 ci:
   image:
-    name: opensearchstaging/ci-runner:ci-runner-centos7-opensearch-build-v2
-    args: -e JAVA_HOME=/opt/java/openjdk-17
+    name: opensearchstaging/ci-runner:ci-runner-centos7-opensearch-build-v3
+    args: -e JAVA_HOME=/opt/java/openjdk-20
 components:
   - name: cross-cluster-replication
     integ-test:

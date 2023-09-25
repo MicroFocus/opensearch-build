@@ -21,7 +21,7 @@ USER 0
 # Add normal dependencies
 RUN dnf clean all && \
     dnf update -y && \
-    dnf install -y which curl git gnupg2 tar net-tools procps-ng python3 python3-devel python3-pip zip unzip jq
+    dnf install -y which curl git gnupg2 tar net-tools procps-ng python39 python39-devel python39-pip zip unzip jq
 
 # Add Dashboards dependencies (mainly for cypress)
 RUN dnf install -y xorg-x11-server-Xvfb gtk2-devel gtk3-devel libnotify-devel GConf2 nss libXScrnSaver alsa-lib
@@ -46,9 +46,11 @@ WORKDIR /usr/share/opensearch
 # Hard code node version and yarn version for now
 # nvm environment variables
 ENV NVM_DIR /usr/share/opensearch/.nvm
-ENV NODE_VERSION 16.14.2
-ENV CYPRESS_VERSION 9.5.4
+ENV NODE_VERSION 18.16.0
+ENV CYPRESS_VERSION 12.13.0
+ARG CYPRESS_VERSION_LIST="5.6.0 9.5.4 12.13.0"
 ENV CYPRESS_LOCATION /usr/share/opensearch/.cache/Cypress/$CYPRESS_VERSION
+ENV CYPRESS_LOCATION_954 /usr/share/opensearch/.cache/Cypress/9.5.4
 # install nvm
 # https://github.com/creationix/nvm#install-script
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
@@ -63,24 +65,18 @@ ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 # install yarn
 COPY --chown=1000:1000 config/yarn-version.sh /tmp
 RUN npm install -g yarn@`/tmp/yarn-version.sh main`
-# install cypress last known version that works for all existing opensearch-dashboards plugin integtests
-RUN npm install -g cypress@$CYPRESS_VERSION && npm cache verify
 # Add legacy cypress@5.6.0 for 1.x line
-RUN npm install -g cypress@5.6.0 && npm cache verify
+# Add legacy cypress@9.5.4 for pre-2.8.0 releases
+# Add latest cypress@12.13.0 for post-2.8.0 releases
+RUN for cypress_version in $CYPRESS_VERSION_LIST; do npm install -g cypress@$cypress_version && npm cache verify; done
 
 # Need root to get pass the build due to chrome sandbox needs to own by the root
 USER 0
-# Build ARM64 Cypress
-COPY --chown=0:0 config/cypress-setup.sh /tmp
-RUN if [ `uname -m` = "aarch64" ]; then echo compile arm64 cypress && /tmp/cypress-setup.sh $CYPRESS_VERSION; fi
-# replace default binary with arm64 specific binary from ci.opensearch.org
-RUN if [ `uname -m` = "aarch64" ]; then rm -rf $CYPRESS_LOCATION/* && \
-    unzip -q /tmp/cypress-$CYPRESS_VERSION.zip -d $CYPRESS_LOCATION/ && chown 1000:1000 -R $CYPRESS_LOCATION; fi && rm -rf /tmp/cypress*
 
-# Add legacy cypress@5.6.0 for ARM64 Architecture
-RUN if [ `uname -m` = "aarch64" ]; then rm -rf /usr/share/opensearch/.cache/Cypress/5.6.0 && \
-    curl -SLO https://ci.opensearch.org/ci/dbc/tools/Cypress-5.6.0-arm64.tar.gz && tar -xzf Cypress-5.6.0-arm64.tar.gz -C /usr/share/opensearch/.cache/Cypress/ && \
-    chown 1000:1000 -R /usr/share/opensearch/.cache/Cypress/5.6.0 && rm -vf Cypress-5.6.0-arm64.tar.gz; fi
+# Add legacy cypress 5.6.0 / 9.5.4 for ARM64 Architecture
+RUN if [ `uname -m` = "aarch64" ]; then for cypress_version in 5.6.0 9.5.4; do rm -rf /usr/share/opensearch/.cache/Cypress/$cypress_version && \
+    curl -SLO https://ci.opensearch.org/ci/dbc/tools/Cypress-$cypress_version-arm64.tar.gz && tar -xzf Cypress-$cypress_version-arm64.tar.gz -C /usr/share/opensearch/.cache/Cypress/ && \
+    chown 1000:1000 -R /usr/share/opensearch/.cache/Cypress/$cypress_version && rm -vf Cypress-$cypress_version-arm64.tar.gz; done; fi
 
 ########################### Stage 1 ########################
 FROM rockylinux:8
@@ -88,9 +84,9 @@ FROM rockylinux:8
 USER 0
 
 # Add normal dependencies
-RUN dnf clean all && \
+RUN dnf clean all && dnf install -y 'dnf-command(config-manager)' && dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
     dnf update -y && \
-    dnf install -y which curl git gnupg2 tar net-tools procps-ng python3 python3-devel python3-pip zip unzip jq
+    dnf install -y which curl git gnupg2 tar net-tools procps-ng python39 python39-devel python39-pip zip unzip jq gh
 
 # Create user group
 RUN dnf install -y sudo && \
@@ -98,13 +94,13 @@ RUN dnf install -y sudo && \
     useradd -u 1000 -g 1000 -d /usr/share/opensearch opensearch && \
     mkdir -p /usr/share/opensearch && \
     chown -R 1000:1000 /usr/share/opensearch && \
-    echo "opensearch ALL=(root) NOPASSWD:`which systemctl`, `which dnf`, `which yum`, `which rpm`, `which chmod`, `which kill`, `which curl`" >> /etc/sudoers.d/opensearch
+    echo "opensearch ALL=(root) NOPASSWD:`which systemctl`, `which dnf`, `which yum`, `which rpm`, `which chmod`, `which kill`, `which curl`, /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin" >> /etc/sudoers.d/opensearch
 
 # Copy from Stage0
 COPY --from=linux_stage_0 --chown=1000:1000 /usr/share/opensearch /usr/share/opensearch
 ENV NVM_DIR /usr/share/opensearch/.nvm
-ENV NODE_VERSION 16.14.2
-ENV CYPRESS_VERSION 9.5.4
+ENV NODE_VERSION 18.16.0
+ENV CYPRESS_VERSION 12.13.0
 ENV CYPRESS_LOCATION /usr/share/opensearch/.cache/Cypress/$CYPRESS_VERSION
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
@@ -112,7 +108,7 @@ ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 # Check dirs
 RUN source $NVM_DIR/nvm.sh && ls -al /usr/share/opensearch && echo $NODE_VERSION $NVM_DIR && nvm use $NODE_VERSION
 
-# Add Python37 dependencies
+# Add Python dependencies
 RUN dnf install -y @development zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel findutils
 
 # Add Dashboards dependencies (mainly for cypress)
@@ -131,24 +127,14 @@ RUN /tmp/jdk-setup.sh && /tmp/yq-setup.sh
 # Setup Shared Memory
 RUN chmod -R 777 /dev/shm
 
-# Install Python37 binary
-RUN curl https://www.python.org/ftp/python/3.7.7/Python-3.7.7.tgz | tar xzvf - && \
-    cd Python-3.7.7 && \
-    ./configure --enable-optimizations && \
-    make altinstall
-
-# Setup Python37 links
-RUN ln -sfn /usr/local/bin/python3.7 /usr/bin/python3 && \
-    ln -sfn /usr/local/bin/pip3.7 /usr/bin/pip && \
-    ln -sfn /usr/local/bin/pip3.7 /usr/local/bin/pip && \
-    ln -sfn /usr/local/bin/pip3.7 /usr/bin/pip3
+# Install Python binary
+RUN update-alternatives --set python /usr/bin/python3.9 && \
+    update-alternatives --set python3 /usr/bin/python3.9 && \
+    pip3 install pip==23.1.2 && pip3 install pipenv==2023.6.12 awscli==1.22.12
 
 # Add other dependencies
 RUN dnf install -y epel-release && dnf clean all && dnf install -y chromium jq && dnf clean all && \
-    pip3 install pip==21.3.1 && \
-    pip3 install cmake==3.21.3 && \
-    pip3 install awscli==1.22.12 && \
-    pip3 install pipenv
+    pip3 install cmake==3.23.3
 
 # We use the version test to check if packages installed correctly
 # And get added to the PATH

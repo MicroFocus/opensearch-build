@@ -6,6 +6,7 @@
     - [Identifying Regressions in Performance Tests](#identifying-regressions-in-performance-tests)
       - [Identifying Regressions in Nightly Performance Tests](#identifying-regressions-in-nightly-performance-tests)
     - [Identifying Issues in Longevity Tests](#identifying-issues-in-longevity-tests)
+  - [Benchmark Tests](#benchmarking-tests)
 - [Testing in CI/CD](#testing-in-cicd)
   - [Test Workflow (in development)](#test-workflow-in-development)
   - [Component-Level Details](#component-level-details)
@@ -109,6 +110,17 @@ To run OpenSearch Dashboards BWC tests.
 opensearch-dashboards=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch-dashboards/1.3.5/4056/linux/x64/tar
 ```
 
+#### BWC tests on distribution bundle level
+
+The BWC tests running on distribution level are using the same framework from OpenSearch. The test cluster is spin up with the `latest` distribution bundle of provided version exclusively when the project is initialized with property `-PcustomDistributionDownloadType=bundle`. In this repo, the test workflow will be enable this gradle property by default.[BWC test script](https://github.com/opensearch-project/opensearch-build/blob/edffab782abf96390b3993ccc92425c63ab77884/scripts/default/bwctest.sh#L38)
+
+Example distribution bundle URL: `https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/1.3.2/latest/linux/x64/tar/dist/opensearch/opensearch-1.3.2-linux-x64.tar.gz`
+This feature for BWC testing is supported for distribution versions starting `v1.3.2`.
+
+On CI level for plugins, security certificates need to be manually imported when spinning up the test cluster as security plugin is included in the distribution bundle. When upgrading the version within the test cluster, `nextNodeToNextVersion` is used for a single node upgrade and `goToNextVersion` is for a full restart upgrade.
+
+See [anomaly-detection#766](https://github.com/opensearch-project/anomaly-detection/pull/766) or [observability#1366](https://github.com/opensearch-project/observability/pull/1366) for more information.
+
 ### Performance Tests
 
 TODO: Add instructions for running performance tests with `test.sh`
@@ -173,6 +185,13 @@ Internal tools provide dashboards for monitoring cluster behavior during these t
 |Query Throughput|Varies based on the query being issued|downward trends between iterations|
 |Indexing Latency|Consistent during each test iteration|upward trends|
 |Query Latency|Varies based on the query being issued|upward trends|
+
+### Benchmarking Tests
+
+Runs benchmarking tests on a remote opensource OpenSearch cluster, uses [OpenSearch Benchmark](https://github.com/opensearch-project/OpenSearch-Benchmark).
+At a high-level the benchmarking test workflow uses [opensearch-cluster-cdk](https://github.com/opensearch-project/opensearch-cluster-cdk.git) to first set-up an OpenSearch cluster (single/multi-node) and then executes `opensearch-benchmark` to run benchmark test against that cluster. The performance metric that opensearch-benchmark generates during the run are ingested into another OS cluster for further analysis and dashboarding purpose.
+
+The benchmarking tests will be run nightly and if you have a feature in any released/un-released OpenSearch version that you want to benchmark periodically please create an issue and the team will reach out to you. In case you want to run the benchmarking test locally you can use `opensearch-cluster-cdk` repo to spin up an OS cluster in your personal AWS account and then use `opensearch-benchmark` to run performance test against it. The detailed instructions are available on respective GitHub repositories.
 
 ## Testing in CI/CD
 

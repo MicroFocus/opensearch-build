@@ -47,14 +47,14 @@ pipeline {
             agent {
                 docker {
                     label 'Jenkins-Agent-AL2-X64-C54xlarge-Docker-Host'
-                    image 'opensearchstaging/ci-runner:ci-runner-centos7-v1'
+                    image 'opensearchstaging/ci-runner:ci-runner-centos7-opensearch-build-v3'
                     registryUrl 'https://public.ecr.aws/'
                     alwaysPull true
                 }
             }
             steps {
                 script {
-                    currentBuild.description = "${DISTRIBUTION_BUILD_NUMBER} ${DISTRIBUTION_PLATFORM} ${DISTRIBUTION_ARCHITECTURE} ${INPUT_MANIFEST}"
+                    currentBuild.description = "${DISTRIBUTION_BUILD_NUMBER} ${DISTRIBUTION_PLATFORM} ${DISTRIBUTION_ARCHITECTURE} ${DISTRIBUTION_NAME} ${INPUT_MANIFEST}"
                     promoteArtifacts(
                         fileActions: [createSha512Checksums(), createSignatureFiles()]
                     )

@@ -1,0 +1,387 @@
+lib = library(identifier: 'jenkins@5.1.0', retriever: modernSCM([
+    $class: 'GitSCMSource',
+    remote: 'https://github.com/opensearch-project/opensearch-build-libraries.git',
+]))
+
+pipeline {
+    agent none
+    options {
+        timeout(time: 24, unit: 'HOURS')
+    }
+    environment {
+        AGENT_LABEL = 'Jenkins-Agent-AL2023-X64-M52xlarge-Docker-Host-Benchmark-Test'
+        BUNDLE_MANIFEST = 'bundle-manifest.yml'
+        JOB_NAME = 'benchmark-test'
+    }
+    triggers {
+        parameterizedCron '''
+            H 1 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 1 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 1 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 1 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 1 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 1 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 1 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 1 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+
+            H 2 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 2 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 1 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 2 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 2 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 2 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 2 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 2 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.8.0/7935/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+
+            H 5 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 5 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 5 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 5 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 5 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 5 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 5 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 5 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+
+            H 6 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 6 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 6 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 6 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 6 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 6 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 6 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 6 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+
+            H 9 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;ENABLE_REMOTE_STORE=true;USER_TAGS=run-type:nightly,segrep:enabled-with-remote-store,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=opensearch.experimental.feature.remote_store.enabled:true cluster.remote_store.enabled:true opensearch.experimental.feature.segment_replication_experimental.enabled:true cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 9 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;ENABLE_REMOTE_STORE=true;USER_TAGS=run-type:nightly,segrep:enabled-with-remote-store,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=opensearch.experimental.feature.remote_store.enabled:true cluster.remote_store.enabled:true opensearch.experimental.feature.segment_replication_experimental.enabled:true cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 9 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;ENABLE_REMOTE_STORE=true;USER_TAGS=run-type:nightly,segrep:enabled-with-remote-store,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=opensearch.experimental.feature.remote_store.enabled:true cluster.remote_store.enabled:true opensearch.experimental.feature.segment_replication_experimental.enabled:true cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 9 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;ENABLE_REMOTE_STORE=true;USER_TAGS=run-type:nightly,segrep:enabled-with-remote-store,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=opensearch.experimental.feature.remote_store.enabled:true cluster.remote_store.enabled:true opensearch.experimental.feature.segment_replication_experimental.enabled:true cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 9 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;ENABLE_REMOTE_STORE=true;USER_TAGS=run-type:nightly,segrep:enabled-with-remote-store,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=opensearch.experimental.feature.remote_store.enabled:true cluster.remote_store.enabled:true opensearch.experimental.feature.segment_replication_experimental.enabled:true cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 9 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;ENABLE_REMOTE_STORE=true;USER_TAGS=run-type:nightly,segrep:enabled-with-remote-store,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=opensearch.experimental.feature.remote_store.enabled:true cluster.remote_store.enabled:true opensearch.experimental.feature.segment_replication_experimental.enabled:true cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 9 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;ENABLE_REMOTE_STORE=true;USER_TAGS=run-type:nightly,segrep:enabled-with-remote-store,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=opensearch.experimental.feature.remote_store.enabled:true cluster.remote_store.enabled:true opensearch.experimental.feature.segment_replication_experimental.enabled:true cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 9 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.9.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;ENABLE_REMOTE_STORE=true;USER_TAGS=run-type:nightly,segrep:enabled-with-remote-store,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=opensearch.experimental.feature.remote_store.enabled:true cluster.remote_store.enabled:true opensearch.experimental.feature.segment_replication_experimental.enabled:true cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+
+            H 13 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 13 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 13 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 13 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 13 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 13 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 13 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-3-data-3-shards;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+            H 13 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-3-data-3-shards;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"2","number_of_shards":"3"}
+
+            H 14 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 14 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 14 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 14 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 14 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 14 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/arm64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 14 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+            H 14 * * * %BUNDLE_MANIFEST_URL=https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/3.0.0/latest/linux/x64/tar/dist/opensearch/manifest.yml;SINGLE_NODE_CLUSTER=false;DATA_NODE_COUNT=3;USE_50_PERCENT_HEAP=true;USER_TAGS=run-type:nightly,segrep:enabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-3-data-3-shards-1-replica;ADDITIONAL_CONFIG=cluster.indices.replication.strategy:SEGMENT;WORKLOAD_PARAMS={"number_of_replicas":"1","number_of_shards":"3"}
+
+            H 15 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/2.9.0-SNAPSHOT/opensearch-min-2.9.0-SNAPSHOT-linux-arm64-latest.tar.gz.build-manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-single-node-min-distribution;WORKLOAD_PARAMS={"number_of_replicas":"0"}
+            H 15 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/2.9.0-SNAPSHOT/opensearch-min-2.9.0-SNAPSHOT-linux-x64-latest.tar.gz.build-manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-single-node-min-distribution;WORKLOAD_PARAMS={"number_of_replicas":"0"}
+            H 15 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/2.9.0-SNAPSHOT/opensearch-min-2.9.0-SNAPSHOT-linux-arm64-latest.tar.gz.build-manifest.yml;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-single-node-min-distribution;WORKLOAD_PARAMS={"number_of_replicas":"0"}
+            H 15 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/2.9.0-SNAPSHOT/opensearch-min-2.9.0-SNAPSHOT-linux-x64-latest.tar.gz.build-manifest.yml;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-single-node-min-distribution;WORKLOAD_PARAMS={"number_of_replicas":"0"}
+            H 15 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/3.0.0-SNAPSHOT/opensearch-min-3.0.0-SNAPSHOT-linux-arm64-latest.tar.gz.build-manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-single-node-min-distribution;WORKLOAD_PARAMS={"number_of_replicas":"0"}
+            H 15 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/3.0.0-SNAPSHOT/opensearch-min-3.0.0-SNAPSHOT-linux-x64-latest.tar.gz.build-manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-single-node-min-distribution;WORKLOAD_PARAMS={"number_of_replicas":"0"}
+            H 15 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/3.0.0-SNAPSHOT/opensearch-min-3.0.0-SNAPSHOT-linux-arm64-latest.tar.gz.build-manifest.yml;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-single-node-min-distribution;WORKLOAD_PARAMS={"number_of_replicas":"0"}
+            H 15 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/3.0.0-SNAPSHOT/opensearch-min-3.0.0-SNAPSHOT-linux-x64-latest.tar.gz.build-manifest.yml;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-single-node-min-distribution;WORKLOAD_PARAMS={"number_of_replicas":"0"}
+
+            H 18 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/2.9.0-SNAPSHOT/opensearch-min-2.9.0-SNAPSHOT-linux-arm64-latest.tar.gz.build-manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-single-node-min-distribution-zstd-no-dict-codec;WORKLOAD_PARAMS={"index_settings":{"codec":"zstd_no_dict","refresh_interval":"30s","translog":{"flush_threshold_size":"4g"}}}
+            H 18 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/2.9.0-SNAPSHOT/opensearch-min-2.9.0-SNAPSHOT-linux-x64-latest.tar.gz.build-manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-single-node-min-distribution-zstd-no-dict-codec;WORKLOAD_PARAMS={"index_settings":{"codec":"zstd_no_dict","refresh_interval":"30s","translog":{"flush_threshold_size":"4g"}}}
+            H 18 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/2.9.0-SNAPSHOT/opensearch-min-2.9.0-SNAPSHOT-linux-arm64-latest.tar.gz.build-manifest.yml;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:2x,cluster-config:arm64-r6g.xlarge-single-node-min-distribution-zstd-no-dict-codec;WORKLOAD_PARAMS={"index_settings":{"codec":"zstd_no_dict","refresh_interval":"30s","translog":{"flush_threshold_size":"4g"}}}
+            H 18 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/2.9.0-SNAPSHOT/opensearch-min-2.9.0-SNAPSHOT-linux-x64-latest.tar.gz.build-manifest.yml;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:2x,cluster-config:x64-r5.xlarge-single-node-min-distribution-zstd-no-dict-codec;WORKLOAD_PARAMS={"index_settings":{"codec":"zstd_no_dict","refresh_interval":"30s","translog":{"flush_threshold_size":"4g"}}}
+            H 18 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/3.0.0-SNAPSHOT/opensearch-min-3.0.0-SNAPSHOT-linux-arm64-latest.tar.gz.build-manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-single-node-min-distribution-zstd-no-dict-codec;WORKLOAD_PARAMS={"index_settings":{"codec":"zstd_no_dict","refresh_interval":"30s","translog":{"flush_threshold_size":"4g"}}}
+            H 18 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/3.0.0-SNAPSHOT/opensearch-min-3.0.0-SNAPSHOT-linux-x64-latest.tar.gz.build-manifest.yml;TEST_WORKLOAD=http_logs;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-single-node-min-distribution-zstd-no-dict-codec;WORKLOAD_PARAMS={"index_settings":{"codec":"zstd_no_dict","refresh_interval":"30s","translog":{"flush_threshold_size":"4g"}}}
+            H 18 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/3.0.0-SNAPSHOT/opensearch-min-3.0.0-SNAPSHOT-linux-arm64-latest.tar.gz.build-manifest.yml;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:arm64,instance-type:r6g.xlarge,major-version:3x,cluster-config:arm64-r6g.xlarge-single-node-min-distribution-zstd-no-dict-codec;WORKLOAD_PARAMS={"index_settings":{"codec":"zstd_no_dict","refresh_interval":"30s","translog":{"flush_threshold_size":"4g"}}}
+            H 18 * * * %BUNDLE_MANIFEST_URL=https://artifacts.opensearch.org/snapshots/core/opensearch/3.0.0-SNAPSHOT/opensearch-min-3.0.0-SNAPSHOT-linux-x64-latest.tar.gz.build-manifest.yml;SINGLE_NODE_CLUSTER=true;USE_50_PERCENT_HEAP=true;MIN_DISTRIBUTION=true;CAPTURE_NODE_STAT=true;USER_TAGS=run-type:nightly,segrep:disabled,arch:x64,instance-type:r5.xlarge,major-version:3x,cluster-config:x64-r5.xlarge-single-node-min-distribution-zstd-no-dict-codec;WORKLOAD_PARAMS={"index_settings":{"codec":"zstd_no_dict","refresh_interval":"30s","translog":{"flush_threshold_size":"4g"}}}
+        '''
+    }
+    parameters {
+        string(
+            name: 'BUNDLE_MANIFEST_URL',
+            description: 'The distribution manifest URL, e.g. https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.3.0/6039/linux/x64/tar/dist/opensearch/manifest.yml',
+            trim: true
+        )
+        string(
+            defaultValue: 'nyc_taxis',
+            name: 'TEST_WORKLOAD',
+            description: 'The workload name from OpenSearch Benchmark Workloads.',
+            trim: true
+        )
+        booleanParam(
+            defaultValue: false,
+            name: 'SECURITY_DISABLED',
+            description: 'Force the security of the cluster to be disabled'
+        )
+        booleanParam(
+            name: 'SINGLE_NODE_CLUSTER',
+            description: 'Benchmark test on a single node cluster',
+            defaultValue: true
+        )
+        booleanParam(
+            name: 'MIN_DISTRIBUTION',
+            description: 'Use OpenSearch min distribution',
+            defaultValue: false
+        )
+        booleanParam(
+            name: 'ENABLE_REMOTE_STORE',
+            description: 'Enable remote-store feature in OpenSearch cluster',
+            defaultValue: false
+        )
+        string(
+            name: 'MANAGER_NODE_COUNT',
+            description: 'Number of cluster manager nodes, empty value defaults to 3.',
+            trim: true
+        )
+        string(
+            name: 'DATA_NODE_COUNT',
+            description: 'Number of cluster data nodes, empty value defaults to 2.',
+            trim: true
+        )
+        string(
+            name: 'CLIENT_NODE_COUNT',
+            description: 'Number of cluster client nodes, empty value default to 0.',
+            trim: true
+        )
+        string(
+            name: 'INGEST_NODE_COUNT',
+            description: 'Number of cluster INGEST nodes, empty value defaults to 0.',
+            trim: true
+        )
+        string(
+            name: 'ML_NODE_COUNT',
+            description: 'Number of cluster ml nodes, empty value defaults to 0.',
+            trim: true
+        )
+        string(
+            name: 'DATA_NODE_STORAGE',
+            description: 'Data node ebs block storage size, empty value defaults to 100Gb',
+            trim: true
+        )
+        string(
+            name: 'ML_NODE_STORAGE',
+            description: 'ML node ebs block storage size, empty value defaults to 100Gb',
+            trim: true
+        )
+        string(
+            name: 'JVM_SYS_PROPS',
+            description: 'A comma-separated list of key=value pairs that will be added to jvm.options as JVM system properties.',
+            trim: true
+        )
+        string(
+            name: 'ADDITIONAL_CONFIG',
+            description: 'Additional opensearch.yml config parameters passed as JSON. e.g., `opensearch.experimental.feature.segment_replication_experimental.enabled:true cluster.indices.replication.strategy:SEGMENT`',
+            trim: true
+        )
+        booleanParam(
+            name: 'USE_50_PERCENT_HEAP',
+            description: 'Use 50 percent of physical memory as heap.',
+            defaultValue: false
+        )
+        string(
+            name: 'USER_TAGS',
+            description: 'Attach arbitrary text to the meta-data of each benchmark metric record, without any spaces. e.g., `run-type:adhoc,segrep:enabled,arch:x64`. ',
+            trim: true
+        )
+        string(
+            name: 'WORKLOAD_PARAMS',
+            description: 'With this parameter you can inject variables into workloads. Use json type. e.g., `{"number_of_replicas":"1","number_of_shards":"5"}`',
+            trim: true
+        )
+        booleanParam(
+            name: 'CAPTURE_NODE_STAT',
+            description: 'Enable opensearch-benchmark node-stats telemetry to capture system level metrics.',
+            defaultValue: false
+        )
+    }
+
+    stages {
+        stage('validate-and-set-parameters') {
+            agent { label AGENT_LABEL }
+            steps {
+                script {
+                    if (BUNDLE_MANIFEST_URL == '') {
+                        currentBuild.result = 'ABORTED'
+                        error("Performance Tests failed to start. Missing parameter: BUNDLE_MANIFEST_URL.")
+                    }
+                    def bundleManifestObj = downloadBuildManifest(
+                        url: BUNDLE_MANIFEST_URL,
+                        path: BUNDLE_MANIFEST
+                    )
+                    String buildId = bundleManifestObj.getArtifactBuildId()
+                    env.BUILD_ID = buildId
+                    env.HAS_SECURITY = bundleManifestObj.components.containsKey("security")
+                    env.ARCHITECTURE = bundleManifestObj.getArtifactArchitecture()
+                    echo "HAS_SECURITY: ${env.HAS_SECURITY}"
+                    lib.jenkins.Messages.new(this).add(JOB_NAME, "Benchmark tests for #${BUILD_ID}")
+                    currentBuild.description = "Running benchmark test for build number: ${BUILD_ID} Manifest: ${BUNDLE_MANIFEST_URL}"
+                }
+            }
+            post {
+                always {
+                    postCleanup()
+                }
+            }
+        }
+        stage('benchmark-test') {
+            parallel {
+                stage('test-with-security') {
+                agent { label AGENT_LABEL }
+                    when {
+                        expression { return HAS_SECURITY.toBoolean() }
+                    }
+                    steps {
+                        script {
+                            def bundleManifestObj = downloadBuildManifest(
+                                url: BUNDLE_MANIFEST_URL,
+                                path: BUNDLE_MANIFEST
+                            )
+                            echo "BUNDLE_MANIFEST: ${BUNDLE_MANIFEST}"
+                            echo "BUILD_ID: ${BUILD_ID}"
+                            echo "Architecture: ${ARCHITECTURE}"
+
+                            runBenchmarkTestScript(
+                                bundleManifest: BUNDLE_MANIFEST,
+                                workload: TEST_WORKLOAD,
+                                insecure: "false",
+                                singleNode: SINGLE_NODE_CLUSTER,
+                                minDistribution: MIN_DISTRIBUTION,
+                                use50PercentHeap: USE_50_PERCENT_HEAP,
+                                enableRemoteStore: ENABLE_REMOTE_STORE,
+                                suffix: "${BUILD_NUMBER}-secure",
+                                managerNodeCount: MANAGER_NODE_COUNT,
+                                dataNodeCount: DATA_NODE_COUNT,
+                                clientNodeCount: CLIENT_NODE_COUNT,
+                                ingestNodeCount: INGEST_NODE_COUNT,
+                                mlNodeCount: ML_NODE_COUNT,
+                                userTag: USER_TAGS.isEmpty() ? "security-enabled:true" : "${USER_TAGS},security-enabled:true",
+                                workloadParams: WORKLOAD_PARAMS,
+                                additionalConfig: ADDITIONAL_CONFIG,
+                                dataStorageSize: DATA_NODE_STORAGE,
+                                mlStorageSize: ML_NODE_STORAGE,
+                                jvmSysProps: JVM_SYS_PROPS,
+                                captureNodeStat: CAPTURE_NODE_STAT
+                            )
+                            lib.jenkins.Messages.new(this).add(JOB_NAME,
+                                lib.jenkins.Messages.new(this).get([JOB_NAME]) +
+                                    "\nBenchmark tests with security for ${BUILD_ID} completed")
+                        }
+                    }
+                    post {
+                        always {
+                            postCleanup()
+                        }
+                    }
+                }
+                stage('test-without-security') {
+                agent { label AGENT_LABEL }
+                    steps {
+                        script {
+                            def bundleManifestObj = downloadBuildManifest(
+                                url: BUNDLE_MANIFEST_URL,
+                                path: BUNDLE_MANIFEST
+                            )
+                            echo "BUNDLE_MANIFEST: ${BUNDLE_MANIFEST}"
+                            echo "BUILD_ID: ${BUILD_ID}"
+                            echo "Architecture: ${ARCHITECTURE}"
+
+                            runBenchmarkTestScript(
+                                bundleManifest: BUNDLE_MANIFEST,
+                                workload: TEST_WORKLOAD,
+                                insecure: "true",
+                                singleNode: SINGLE_NODE_CLUSTER,
+                                minDistribution: MIN_DISTRIBUTION,
+                                use50PercentHeap: USE_50_PERCENT_HEAP,
+                                enableRemoteStore: ENABLE_REMOTE_STORE,
+                                suffix: "${BUILD_NUMBER}",
+                                managerNodeCount: MANAGER_NODE_COUNT,
+                                dataNodeCount: DATA_NODE_COUNT,
+                                clientNodeCount: CLIENT_NODE_COUNT,
+                                ingestNodeCount: INGEST_NODE_COUNT,
+                                mlNodeCount: ML_NODE_COUNT,
+                                userTag: USER_TAGS.isEmpty() ? "security-enabled:false" : "${USER_TAGS},security-enabled:false",
+                                workloadParams: WORKLOAD_PARAMS,
+                                additionalConfig: ADDITIONAL_CONFIG,
+                                dataStorageSize: DATA_NODE_STORAGE,
+                                mlStorageSize: ML_NODE_STORAGE,
+                                jvmSysProps: JVM_SYS_PROPS,
+                                captureNodeStat: CAPTURE_NODE_STAT
+                            )
+                            lib.jenkins.Messages.new(this).add(JOB_NAME,
+                                lib.jenkins.Messages.new(this).get([JOB_NAME]) +
+                                "\nBenchmark tests without security for ${BUILD_ID} completed")
+                        }
+                    }
+                    post {
+                        always {
+                            postCleanup()
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+    post {
+        success {
+            node(AGENT_LABEL) {
+                script {
+                    def stashed = lib.jenkins.Messages.new(this).get([JOB_NAME])
+                    publishNotification(
+                        icon: ':white_check_mark:',
+                        message: 'Benchmark Tests Successful',
+                        extra: stashed,
+                        credentialsId: 'jenkins-integ-test-webhook',
+                    )
+                    postCleanup()
+                }
+            }
+        }
+        failure {
+            node(AGENT_LABEL) {
+                script {
+                    def stashed = lib.jenkins.Messages.new(this).get([JOB_NAME])
+                    publishNotification(
+                        icon: ':warning:',
+                        message: 'Benchmark Tests Failed',
+                        extra: stashed,
+                        credentialsId: 'jenkins-integ-test-webhook',
+                    )
+                    postCleanup()
+                }
+            }
+        }
+        aborted {
+            node(AGENT_LABEL) {
+                script {
+                    def stackNames = [
+                    "opensearch-infra-stack-${BUILD_NUMBER}-${BUILD_ID}-${ARCHITECTURE}",
+                    "opensearch-infra-stack-${BUILD_NUMBER}-secure-${BUILD_ID}-${ARCHITECTURE}"
+                    ]
+                    withCredentials([string(credentialsId: 'perf-test-account-id', variable: 'PERF_TEST_ACCOUNT_ID')]) {
+                        withAWS(role: 'cfn-set-up', roleAccount: "${PERF_TEST_ACCOUNT_ID}", duration: 900, roleSessionName: 'jenkins-session', region: 'us-east-1') {
+                            try {
+                                for (String stackName : stackNames) {
+                                    def stack = null
+                                    try {
+                                        stack = cfnDescribe(stack: stackName)
+                                    } catch (Exception) {
+                                        echo "Stack '${stackName}' does not exist, nothing to remove"
+                                    }
+                                    if (stack != null) {
+                                        echo "Deleting stack '${stackName}'"
+                                        cfnDelete(stack: stackName, pollInterval:1000)
+                                    }
+                                }
+                            } catch (Exception e) {
+                                error "Exception occurred while deleting the CloudFormation stack: ${e.toString()}"
+                            }
+                        }
+                    }
+                }
+                postCleanup()
+            }
+        }
+    }
+}

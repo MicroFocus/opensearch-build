@@ -13,15 +13,11 @@ FROM centos:7
 # Ensure localedef running correct with root permission
 USER 0
 
-# Setup ENV to prevent ASCII data issues with Python3
-RUN echo "export LC_ALL=en_US.utf-8" >> /etc/profile.d/python3_ascii.sh && \
-    echo "export LANG=en_US.utf-8" >> /etc/profile.d/python3_ascii.sh && \
-    localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || echo set locale
-
 # Add normal dependencies
-RUN yum clean all && \
+RUN yum clean all && yum-config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+    yum install epel-release -y && \
     yum update -y && \
-    yum install -y which curl git gnupg2 tar net-tools procps-ng python3 python3-devel python3-pip zip unzip jq
+    yum install -y which curl git gnupg2 tar net-tools procps-ng python3 python3-devel python3-pip zip unzip jq gh
 
 # Create user group
 RUN groupadd -g 1000 opensearch && \
@@ -29,25 +25,25 @@ RUN groupadd -g 1000 opensearch && \
     mkdir -p /usr/share/opensearch && \
     chown -R 1000:1000 /usr/share/opensearch
 
-# Add Python37 dependencies
+# Add Python dependencies
 RUN yum install -y @development zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel findutils && \
     yum clean all
 
-# Install Python37 binary
-RUN curl https://www.python.org/ftp/python/3.7.7/Python-3.7.7.tgz | tar xzvf - && \
-    cd Python-3.7.7 && \
+# Install Python binary
+RUN curl https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz | tar xzvf - && \
+    cd Python-3.9.7 && \
     ./configure --enable-optimizations && \
     make altinstall
 
-# Setup Python37 links
-RUN ln -sfn /usr/local/bin/python3.7 /usr/bin/python3 && \
-    ln -sfn /usr/local/bin/pip3.7 /usr/bin/pip && \
-    ln -sfn /usr/local/bin/pip3.7 /usr/local/bin/pip && \
-    ln -sfn /usr/local/bin/pip3.7 /usr/bin/pip3 && \
-    pip3 install pipenv && pipenv --version
+# Setup Python links
+RUN ln -sfn /usr/local/bin/python3.9 /usr/bin/python3 && \
+    ln -sfn /usr/local/bin/pip3.9 /usr/bin/pip && \
+    ln -sfn /usr/local/bin/pip3.9 /usr/local/bin/pip && \
+    ln -sfn /usr/local/bin/pip3.9 /usr/bin/pip3 && \
+    pip3 install pip==23.1.2 && pip3 install pipenv==2023.6.12 awscli==1.22.12
 
 # Add performance dependencies
-RUN pip3 install pip==21.3.1 awscli==1.22.12 dataclasses_json~=0.5 aws_requests_auth~=0.4 json2html~=1.3.0 aws-cdk.core~=1.143.0 aws_cdk.aws_ec2~=1.143.0 \
+RUN pip3 install dataclasses_json~=0.5 aws_requests_auth~=0.4 json2html~=1.3.0 aws-cdk.core~=1.143.0 aws_cdk.aws_ec2~=1.143.0 \
                  aws_cdk.aws_iam~=1.143.0 boto3~=1.18 setuptools~=57.4 retry~=0.9
 
 # install yq
@@ -61,8 +57,8 @@ WORKDIR /usr/share/opensearch
 # Hard code node version and yarn version for now
 # nvm environment variables
 ENV NVM_DIR /usr/share/opensearch/.nvm
-ENV NODE_VERSION 16.14.2
-ARG NODE_VERSION_LIST="16.14.2"
+ENV NODE_VERSION 16.20.0
+ARG NODE_VERSION_LIST="16.14.2 16.20.0"
 # install nvm
 # https://github.com/creationix/nvm#install-script
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash

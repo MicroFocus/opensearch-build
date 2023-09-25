@@ -50,6 +50,11 @@ class ServiceOpenSearchDashboards(Service):
 
         self.__set_logging_dest()
 
+        # Newer version of NodeJS (16/18) might introduced bug when running test against localhost using cypress
+        # https://github.com/cypress-io/github-action/issues/811
+        # Temporarily set these additional configs to resolve the issue
+        self.additional_config["server.host"] = '0.0.0.0'
+
         if self.additional_config:
             self.__add_plugin_specific_config(self.additional_config)
 
@@ -67,7 +72,9 @@ class ServiceOpenSearchDashboards(Service):
     def __remove_security(self) -> None:
         self.security_plugin_dir = os.path.join(self.install_dir, "plugins", "securityDashboards")
         if os.path.isdir(self.security_plugin_dir):
-            plugin_script = "opensearch-dashboards-plugin.bat" if current_platform() == "windows" else "bash opensearch-dashboards-plugin"
+            plugin_script = "opensearch-dashboards-plugin.bat" if current_platform() == "windows" else "opensearch-dashboards-plugin"
+            plugin_script = os.path.join(self.executable_dir, plugin_script)
+            plugin_script = "sudo " + plugin_script if self.dist.require_sudo is True else plugin_script
             subprocess.check_call(f"{plugin_script} remove --allow-root securityDashboards", cwd=self.executable_dir, shell=True)
 
         with open(self.opensearch_dashboards_yml_path, "w") as yamlfile:
