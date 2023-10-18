@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-# This dockerfile generates an AmazonLinux-based image containing an OpenSearch installation.
+# This dockerfile generates an AmazonLinux-based image containing an OpenSearch installation (1.x Only).
 # Dockerfile for building an OpenSearch image.
 # It assumes that the working directory contains these files: an OpenSearch tarball (opensearch.tgz), log4j2.properties, opensearch.yml, opensearch-docker-entrypoint.sh, opensearch-onetime-setup.sh.
 # Build arguments:
@@ -14,7 +14,7 @@
 
 
 ########################### Stage 0 ########################
-FROM amazonlinux:2 AS linux_stage_0
+FROM public.ecr.aws/amazonlinux/amazonlinux:2 AS linux_stage_0
 
 ARG UID=1000
 ARG GID=1000
@@ -50,7 +50,7 @@ RUN ls -l $TEMP_DIR && \
 
 ########################### Stage 1 ########################
 # Copy working directory to the actual release docker images
-FROM amazonlinux:2
+FROM public.ecr.aws/amazonlinux/amazonlinux:2
 
 ARG UID=1000
 ARG GID=1000
@@ -101,7 +101,7 @@ LABEL org.label-schema.schema-version="1.0" \
   org.label-schema.name="opensearch" \
   org.label-schema.version="$VERSION" \
   org.label-schema.url="https://opensearch.org" \
-  org.label-schema.vcs-url="https://github.com/OpenSearch" \
+  org.label-schema.vcs-url="https://github.com/opensearch-project/OpenSearch" \
   org.label-schema.license="Apache-2.0" \
   org.label-schema.vendor="OpenSearch" \
   org.label-schema.description="$NOTES" \

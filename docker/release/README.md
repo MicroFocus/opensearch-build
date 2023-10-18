@@ -2,13 +2,22 @@
 We support building OpenSearch and OpenSearch Dashboards docker for both [multi-CPU](https://docs.docker.com/desktop/multi-arch/) and single CPU architectures.
 Users are welcome to choose either type of the image to build on their local development environment, or directly pulling existing images published on Docker Hub:
 
-[OpenSearch Docker Repository](https://hub.docker.com/r/opensearchproject/opensearch/)
+[OpenSearch DockerHub Repository](https://hub.docker.com/r/opensearchproject/opensearch/)
 
-[OpenSearch-Dashboards Docker Repository](https://hub.docker.com/r/opensearchproject/opensearch-dashboards/)
+[OpenSearch-Dashboards DockerHub Repository](https://hub.docker.com/r/opensearchproject/opensearch-dashboards/)
+
+[OpenSearch ECR Repository](https://gallery.ecr.aws/opensearchproject/opensearch/)
+
+[OpenSearch-Dashboards ECR Repository](https://gallery.ecr.aws/opensearchproject/opensearch-dashboards/)
 
 ```
+# DockerHub
 docker pull opensearchproject/opensearch:latest
 docker pull opensearchproject/opensearch-dashboards:latest
+
+# ECR
+docker pull public.ecr.aws/opensearchproject/opensearch:latest
+docker pull public.ecr.aws/opensearchproject/opensearch-dashboards:latest
 ```
 
 ### Building Docker Images
@@ -32,6 +41,10 @@ Verify if you have Docker Desktop or Docker Buildx Standalone by running:
 You need to run both script within the `opensearch-build/docker/release` folder. Running them
   within other path would cause the scripts to fail.
 
+
+The OpenSearch and OpenSearch-Dashboards Docker image is based on [AmazonLinux container images](https://github.com/amazonlinux/container-images) and sourced directly from the official [AmazonLinux ECR Repository](https://gallery.ecr.aws/amazonlinux/amazonlinux/) to get timely updates.
+
+
 #### Build single-arch image with these commands:
   * OpenSearch 1.0.0 x64:
     ```
@@ -49,7 +62,7 @@ You need to run both script within the `opensearch-build/docker/release` folder.
     ```
     ./build-image-single-arch.sh -v 1.0.0 -f ./dockerfiles/opensearch-dashboards.al2.dockerfile -p opensearch-dashboards -a arm64 -t opensearch-dashboards-1.0.0.tar.gz
     ```
-#### Build multi-arch image with this commands (only support x64 + arm64 in one image for now), the image will immediately uploaded to a docker registry so you need to provide docker repo name:
+#### Build multi-arch image with this commands (only support x64 + arm64 in one image for now), the image will be immediately uploaded to a docker registry, so you need to provide docker repo name:
   * OpenSearch 1.0.0:
     ```
     ./build-image-multi-arch.sh -v 1.0.0 -f ./dockerfiles/opensearch.al2.dockerfile -p opensearch -a "x64,arm64" -r "<Docker Hub RepoName>/<Docker Image Name>:<Tag Name>"
@@ -103,7 +116,7 @@ Here are three example scenarios of using above variables:
      $ docker run -it --network="host" -e opensearchproject/opensearch-dashboards:1.1.0
      ```
 
-### Disable Performance Analyzer Agent Cli and Related Configurations
+### Disable Performance Analyzer Agent CLI and Related Configurations
 (This change is added after OpenSearch 2.4.0 and after OpenSearch 1.3.6)
 
   * 1 for OpenSearch:

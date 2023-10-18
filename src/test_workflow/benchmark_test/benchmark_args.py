@@ -18,6 +18,8 @@ from test_workflow.json_args import JsonArgs
 # Contains the arguments required to run a perf test.
 class BenchmarkArgs:
     bundle_manifest: IO
+    distribution_url: str
+    distribution_version: str
     stack_suffix: str
     config: IO
     keep: bool
@@ -33,6 +35,7 @@ class BenchmarkArgs:
     ml_node_storage: int
     jvm_sys_props: str
     additional_config: str
+    data_instance_type: str
     use_50_percent_heap: bool
     enable_remote_store: bool
     workload: str
@@ -40,13 +43,16 @@ class BenchmarkArgs:
     benchmark_config: IO
     user_tag: str
     target_hosts: str
-    capture_node_stat: bool
+    telemetry: list
+    telemetry_params: str
     logging_level: int
 
     def __init__(self) -> None:
         parser = argparse.ArgumentParser(description="Test an OpenSearch Bundle")
-        parser.add_argument("--bundle-manifest", type=argparse.FileType("r"), help="Bundle Manifest file.",
-                            required=True)
+        parser.add_argument("--bundle-manifest", type=argparse.FileType("r"), help="Bundle Manifest file.")
+        parser.add_argument("--distribution-url", dest="distribution_url", help="Link to a downloadable OpenSearch tarball.")
+        parser.add_argument("--distribution-version", dest="distribution_version",
+                            help="provide OpenSearch version if using distribution-url param.")
         parser.add_argument("--suffix", dest="suffix", help="Suffix to be added to stack name for performance test")
         parser.add_argument("--component", dest="component", default="OpenSearch",
                             help="Component name that needs to be performance tested")
@@ -80,6 +86,8 @@ class BenchmarkArgs:
                             help="User provided data-node ebs block storage size, defaults to 100Gb")
         parser.add_argument("--enable-remote-store", dest="enable_remote_store", action="store_true",
                             help="Enable Remote Store feature in OpenSearch")
+        parser.add_argument("--data-instance-type", dest="data_instance_type",
+                            help="EC2 instance type for data node, defaults to r5.xlarge.")
         parser.add_argument("--workload", dest="workload", required=True,
                             help="Name of the workload that OpenSearch Benchmark should run")
         parser.add_argument("--benchmark-config", dest="benchmark_config",
@@ -89,13 +97,20 @@ class BenchmarkArgs:
         parser.add_argument("--workload-params", dest="workload_params",
                             help="With this parameter you can inject variables into workloads. Parameters differs "
                                  "for each workload type. e.g., --workload-params \"number_of_replicas:1,number_of_shards:5\"")
-        parser.add_argument("--capture-node-stat", dest="capture_node_stat", action="store_true",
+        parser.add_argument("--capture-node-stat", dest="telemetry", action="append_const", const="node-stats",
                             help="Enable opensearch-benchmark to capture node stat metrics such as cpu, mem, jvm etc as well.")
+        parser.add_argument("--capture-segment-replication-stat", dest="telemetry", action="append_const",
+                            const="segment-replication-stats",
+                            help="Enable opensearch-benchmark to segment_replication stat metrics such as replication lag.")
+        parser.add_argument("--telemetry-params", dest="telemetry_params",
+                            help="Allows to set parameters for telemetry devices. Accepts json input.")
         parser.add_argument("-v", "--verbose", help="Show more verbose output.", action="store_const", default=logging.INFO,
                             const=logging.DEBUG, dest="logging_level")
 
         args = parser.parse_args()
-        self.bundle_manifest = args.bundle_manifest
+        self.bundle_manifest = args.bundle_manifest if args.bundle_manifest else None
+        self.distribution_url = args.distribution_url if args.distribution_url else None
+        self.distribution_version = args.distribution_version if args.distribution_version else None
         self.stack_suffix = args.suffix if args.suffix else None
         self.config = args.config
         self.keep = args.keep
@@ -112,11 +127,18 @@ class BenchmarkArgs:
         self.data_node_storage = args.data_node_storage if args.data_node_storage else None
         self.ml_node_storage = args.ml_node_storage if args.ml_node_storage else None
         self.enable_remote_store = args.enable_remote_store
+        self.data_instance_type = args.data_instance_type if args.data_instance_type else None
         self.workload = args.workload
         self.workload_params = args.workload_params if args.workload_params else None
         self.benchmark_config = args.benchmark_config if args.benchmark_config else None
         self.user_tag = args.user_tag if args.user_tag else None
         self.additional_config = json.dumps(args.additional_config) if args.additional_config is not None else None
         self.use_50_percent_heap = args.use_50_percent_heap
-        self.capture_node_stat = args.capture_node_stat
+        self.telemetry = args.telemetry
+        self.telemetry_params = args.telemetry_params if args.telemetry_params else None
         self.logging_level = args.logging_level
+
+        if self.bundle_manifest is None and self.distribution_url is None:
+            raise Exception('Please provide either --bundle-manifest or --distribution-url to run the performance test.')
+        elif self.distribution_url and self.distribution_version is None:
+            raise Exception("--distribution-version is required parameter while using --distribution-url param.")

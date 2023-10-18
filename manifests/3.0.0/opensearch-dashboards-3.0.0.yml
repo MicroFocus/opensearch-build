@@ -5,7 +5,7 @@ build:
   version: 3.0.0
 ci:
   image:
-    name: opensearchstaging/ci-runner:ci-runner-centos7-opensearch-dashboards-build-v4
+    name: opensearchstaging/ci-runner:ci-runner-rockylinux8-opensearch-dashboards-build-v1
 components:
   - name: OpenSearch-Dashboards
     repository: https://github.com/opensearch-project/OpenSearch-Dashboards.git
@@ -37,4 +37,19 @@ components:
     ref: main
   - name: customImportMapDashboards
     repository: https://github.com/opensearch-project/dashboards-maps.git
+    ref: main
+  - name: anomalyDetectionDashboards
+    repository: https://github.com/opensearch-project/anomaly-detection-dashboards-plugin
+    ref: main
+  - name: mlCommonsDashboards
+    repository: https://github.com/opensearch-project/ml-commons-dashboards.git
+    ref: main
+  - name: indexManagementDashboards
+    repository: https://github.com/opensearch-project/index-management-dashboards-plugin.git
+    ref: main
+  - name: alertingDashboards
+    repository: https://github.com/opensearch-project/alerting-dashboards-plugin.git
+    ref: main
+  - name: securityAnalyticsDashboards
+    repository: https://github.com/opensearch-project/security-analytics-dashboards-plugin.git
     ref: main
